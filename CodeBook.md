@@ -3,11 +3,11 @@
 **Study Design**
 
 * Here are the details of run_analysis.R script to create tidy data. For setup information, please refer to README.md.
-    i. Following libraries were loaded in R
+    1. Following libraries were loaded in R
         + library(data.table)
         + library(reshape2)
         + library(timeSeries)
-    ii. The following files were read into R using read.table(). Description of the files is from the README.txt file included in the zip file.
+    2. The following files were read into R using read.table(). Description of the files is from the README.txt file included in the zip file.
         + activity_labels.txt <- read.table("./activity_labels.txt")
             - Links the class label with their activity name.
         + features.txt <- read.table("./features.txt")
@@ -24,7 +24,7 @@
             - Train set.
         + y_train.txt <- read.table("./train/y_train.txt")
             - Train label.
-    iii. (Instruction step 1) Datasets in train and test directories were merged to a master dataset using rbind().
+    3. (Instruction step 1) Datasets in train and test directories were merged to a master dataset using rbind().
         + subject_master.txt <- rbind(subject_train.txt, subject_test.txt)
             - 1 column. It is the subject ID. There are 30 subjects from 1 - 30.
             - 10299 rows. Each row identifies the subject who performed the activity for fixed-width sliding windows of 2.56 sec and 50% overlap (128 readings/window). 
@@ -34,12 +34,12 @@
         + y_master.txt <- rbind(y_train.txt,y_test.txt)
             - 1 column. It is the activity ID. There are 6 activities from 1 - 6.
             - 10299 rows. Each row identifies an activity performed by a subject for a window sample.
-    iv. (Instruction step 2) Columns that measure mean() or std() have been extracted from X_master.txt to form mean.std.data
+    4. (Instruction step 2) Columns that measure mean() or std() have been extracted from X_master.txt to form mean.std.data
         + mean.std.features <- subset(features.txt, grepl("mean\\(",features.txt\$V2, ignore.case=TRUE) | grepl("std\\(",features.txt$V2, ignore.case=TRUE))
             - Of the 561 features in features.txt, 66 features that measure mean() or std() have been assigned to mean.std.features.
         + mean.std.data <- select(X_master.txt, mean.std.features$V1)
             - 66 columns that correspond to features in mean.std.features have been selected from X_master.txt to form mean.std.data
-    v. (Instruction step 3) Assign descriptive activity names to name the activities in the data set
+    5. (Instruction step 3) Assign descriptive activity names to name the activities in the data set
         + master.data <- cbind(subject_master.txt, y_master.txt, mean.std.data)
             - use cbind() to concatnate subject_master.txt, y_master.txt, and mean.std.data to form master.data
         + setnames(activity_labels.txt, 1:2, c("activity_id", "activity"))
@@ -52,12 +52,12 @@
             - merge activity_labels.txt and master.data by activity_id to form merged.data
         + merged.data <- merged.data[,-1]
             - Drops the activity_id as it is not longer needed.
-    vi. (Instruction step 4) Label merged.data with descriptive variable names. 
+    5. (Instruction step 4) Label merged.data with descriptive variable names. 
         + mean.std.features_list <- lapply(mean.std.features$V2, as.character)
             - lapply is used to create a list of features called mean.std.features_list
         + setnames(merged.data, 3:length(merged.data), unlist(mean.std.features_list))
             - column names are assigned to merged.data using the list mean.std.features_list from previous step
-    vii. (Instruction step 5) From the data set in Step 4, create a second, independent tidy data set with the average of each variable for each activity and each subject.
+    7. (Instruction step 5) From the data set in Step 4, create a second, independent tidy data set with the average of each variable for each activity and each subject.
         + aggregated.data <- aggregate(merged.data[, 3:length(merged.data)], list(merged.data\$subject_id, merged.data$activity), mean)
             - aggregate() function is used to calculate the mean of each feature variable for each activity and each subject
         + tidy.data <- melt(aggregated.data, id.vars = c("Group.1","Group.2"))
